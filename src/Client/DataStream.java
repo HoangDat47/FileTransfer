@@ -16,7 +16,9 @@ public class DataStream extends Thread {
 		this.start();
 	}
 	public void run(){
+		//msg1 là tên người gởi, msg2 là nội dung tin nhắn
 		String msg1,msg2;
+		//ham nay se chay lien tuc de nhan tin nhan tu server
 		while(run){
 			try {
 				msg1=dis.readUTF();
@@ -32,6 +34,7 @@ public class DataStream extends Thread {
 			e.printStackTrace();
 		}
 	}
+
 	public void stopThread(){
 		this.run=false;
 	}

@@ -151,6 +151,7 @@ public class Client extends JFrame implements ActionListener{
 	public void getMSG(String msg1, String msg2){
 		int stt = Integer.parseInt(msg1);
 		switch (stt) {
+			//case 1 la tin nhan cua minh//case 2 la tin nhan cua nguoi khac
 		// tin nhắn của những người khác
 		case 3:
 			this.msg.append(msg2);

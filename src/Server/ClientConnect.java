@@ -26,6 +26,7 @@ public class ClientConnect extends Thread {
 		}
 
 	}
+
 	public void run(){
 		// xữ lý đăng nhập
 		String msg;
@@ -96,6 +97,8 @@ public class ClientConnect extends Thread {
 		}
 
 	}
+
+	//voi mesg1 la stt, msg2 la data
 	public void sendMSG(String msg1,String msg2){
 		sendMSG(msg1);
 		sendMSG(msg2);

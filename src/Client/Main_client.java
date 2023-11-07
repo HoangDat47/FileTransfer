@@ -5,6 +5,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.Socket;
 
 public class Main_client extends JFrame {
@@ -43,7 +44,25 @@ public class Main_client extends JFrame {
         new Main_client().go();
     }
 
-    private void exit() {
+    private void exit(){
+        try {
+            sendMSG("0");
+            dos.close();
+            dis.close();
+            client.close();
+        } catch (IOException e1) {
+            e1.printStackTrace();
+        }
         System.exit(0);
+    }
+
+    //hàm sendMSG dùng để gởi tin nhắn tới server
+    private void sendMSG(String data){
+        try {
+            dos.writeUTF(data);
+            dos.flush();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

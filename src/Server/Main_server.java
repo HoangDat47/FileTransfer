@@ -11,10 +11,8 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 public class Main_server extends JFrame {
-    private JPanel jPanel1;
     public JTextArea tar_user;
-    private ServerSocket serverSocket;
-    private Hashtable<String, ClientHandler> listUser;
+    Hashtable<String, ClientHandler> listUser;
 
     public Main_server() {
         super("Server");
@@ -31,7 +29,7 @@ public class Main_server extends JFrame {
     }
 
     private void init() {
-        jPanel1 = new JPanel(new BorderLayout());
+        JPanel jPanel1 = new JPanel(new BorderLayout());
 
         tar_user = new JTextArea(10,20);
         tar_user.setEditable(false);
@@ -42,6 +40,7 @@ public class Main_server extends JFrame {
         add(jPanel1);
     }
 
+    //ham sendAll dung de gui tin nhan cho tat ca cac client
     public void sendAll(String from, String msg){
         Enumeration e = listUser.keys();
         String name;
@@ -52,13 +51,38 @@ public class Main_server extends JFrame {
         }
     }
 
+    //hàm sendAllUpdate gởi tên tất cả client tới tất cả client
+    public void sendAllUpdate(String from){
+        Enumeration e = listUser.keys();
+        String name;
+        while(e. hasMoreElements()){
+            //nextElement() trả về phần tử tiếp theo của enumeration
+            name=(String) e.nextElement();
+            System.out.println(name);
+            //compareTo() so sánh 2 chuỗi
+            if(name.compareTo(from)!=0) listUser.get(name).sendMSG("4",getAllName());
+        }
+    }
+
+    //hàm getAllName trả về tên tất cả client
+    public String getAllName(){
+        //Enumeration là một interface, nó được sử dụng để liệt kê các phần tử của một đối tượng
+        Enumeration e = listUser.keys();
+        String name="";
+        //hasMoreElements() trả về true nếu vẫn còn phần tử trong danh sách
+        while(e. hasMoreElements()){
+            name+= e.nextElement() +"\n";
+        }
+        return name;
+    }
+
     private void go() {
         try {
             listUser = new Hashtable<>();
-            serverSocket = new ServerSocket(12345);
+            ServerSocket serverSocket = new ServerSocket(12345);
             tar_user.append("Server is running...\n");
             System.out.println("Server is running...");
-            while (true) {
+            while (!serverSocket.isClosed()) {
                 Socket client = serverSocket.accept();
                 new ClientHandler(this, client);
             }
