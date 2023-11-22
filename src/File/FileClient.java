@@ -1,3 +1,5 @@
+package File;
+
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
@@ -39,16 +41,13 @@ public class FileClient {
         jpFile.add(jbChooseFile);
         jpFile.add(jbSendFile);
 
-        jbChooseFile.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser jFileChooser = new JFileChooser();
-                jFileChooser.setDialogTitle("Choose a file to send");
+        jbChooseFile.addActionListener(e -> {
+            JFileChooser jFileChooser = new JFileChooser();
+            jFileChooser.setDialogTitle("Choose a file to send");
 
-                if(jFileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-                    fileToSend[0] = jFileChooser.getSelectedFile();
-                    jlFile.setText("The file you chose is: " + fileToSend[0].getName());
-                }
+            if(jFileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+                fileToSend[0] = jFileChooser.getSelectedFile();
+                jlFile.setText("The file you chose is: " + fileToSend[0].getName());
             }
         });
 

@@ -9,6 +9,8 @@ public class ClientConnect extends Thread {
     public Socket client;
     public Server server;
     private String nickName;
+    private String ipAddress;
+    private int port;
     private DataOutputStream dos;
     private DataInputStream dis;
     private boolean run;
@@ -24,7 +26,6 @@ public class ClientConnect extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     public void run() {
@@ -35,6 +36,8 @@ public class ClientConnect extends Thread {
             if (nickName.compareTo("0") == 0) {
                 logout();
             } else {
+                ipAddress = client.getInetAddress().getHostAddress();
+                port = client.getPort();
                 if (checkNick(nickName)) {
                     sendMSG("0");
                 } else {
@@ -120,6 +123,10 @@ public class ClientConnect extends Thread {
         String name = server.getAllName();
         sendMSG("4");
         sendMSG(name);
+    }
+
+    public String getClientAddress() {
+        return ipAddress + ":" + port;
     }
 }
 

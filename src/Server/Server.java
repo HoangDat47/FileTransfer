@@ -8,8 +8,10 @@ import java.awt.event.WindowEvent;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.Hashtable;
+import java.util.List;
 
 import javax.swing.*;
 
@@ -68,6 +70,10 @@ public class Server extends JFrame implements ActionListener {
             while (true) {
                 Socket client = serverSocket.accept();
                 new ClientConnect(this, client);
+
+                //in ra listUser, ip và port của client
+                System.out.println(client.getInetAddress().getHostAddress());
+                System.out.println(client.getPort());
             }
         } catch (IOException e) {
             TAUser.append("Không thể khởi động máy chủ\n");
@@ -112,6 +118,7 @@ public class Server extends JFrame implements ActionListener {
     //hàm getAllName trả về tên tất cả client
     public String getAllName() {
         //Enumeration là một interface, nó được sử dụng để liệt kê các phần tử của một đối tượng
+        //listUser.keys() trả về tập hợp các key của listUser, trong khi đó key là tên của client
         Enumeration e = listUser.keys();
         String name = "";
         while (e.hasMoreElements()) {
