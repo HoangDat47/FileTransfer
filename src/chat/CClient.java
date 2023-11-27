@@ -18,11 +18,10 @@ public class CClient extends JFrame {
     private int id;
 
     //des components UI
-    private JPanel jPanel1, jPanel2, jPanel3, jPanel33, jPanel4;
+    private JPanel chatPanel, filePanel, jPanel1, jPanel2, jPanel22, jPanel3;
     private JButton jButton1;
     private JComboBox<String> jComboBox1;
     private JLabel jLabel1, jLabel2, jLabel3;
-    private JScrollPane jScrollPane1, jScrollPane2;
     private JTabbedPane jTabbedPane1;
     private JTextArea jTextArea1, jTextArea2;
     private JTextField jTextField1;
@@ -42,83 +41,88 @@ public class CClient extends JFrame {
 
     @SuppressWarnings("unchecked")
     private void initComponents() {
-        jPanel3 = new JPanel();
+        // Tạo JTabbedPane để chứa các tab
         jTabbedPane1 = new JTabbedPane();
-        jPanel1 = new JPanel();
-        jScrollPane2 = new JScrollPane();
-        jTextArea2 = new JTextArea();
-        jPanel2 = new JPanel();
-        jScrollPane1 = new JScrollPane();
-        jTextArea1 = new JTextArea();
-        jTextField1 = new JTextField();
+
+        // Panel cho tab "Chat"
+        chatPanel = new JPanel();
+        chatPanel.setLayout(new BorderLayout());
+
+        // Panel cho tab "File"
+        filePanel = new JPanel();
+        filePanel.setLayout(new BorderLayout());
+
+        // Thêm tab "Chat" vào JTabbedPane
+        jTabbedPane1.addTab("Chat", chatPanel);
+        jTabbedPane1.addTab("File", filePanel);
+
+        // Khởi tạo các button
         jButton1 = new JButton();
-        jComboBox1 = new JComboBox<>();
-        jLabel1 = new JLabel();
-        jLabel2 = new JLabel();
-        jLabel3 = new JLabel();
-
-        GroupLayout jPanel3Layout = new GroupLayout(jPanel3);
-        jPanel3.setLayout(jPanel3Layout);
-        jPanel3Layout.setHorizontalGroup(
-                jPanel3Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGap(0, 100, Short.MAX_VALUE)
-        );
-        jPanel3Layout.setVerticalGroup(
-                jPanel3Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addGap(0, 100, Short.MAX_VALUE)
-        );
-
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-        jTextArea2.setColumns(20);
-        jTextArea2.setRows(5);
-        jScrollPane2.setViewportView(jTextArea2);
-
-        GroupLayout jPanel1Layout = new GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        /*jPanel1Layout.setHorizontalGroup(
-                jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
-        );
-        jPanel1Layout.setVerticalGroup(
-                jPanel1Layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(jScrollPane2, GroupLayout.Alignment.TRAILING, GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE)
-        );*/
-
-        jTabbedPane1.addTab("Danh sách online", jPanel1);
-
-        jTextArea1.setColumns(20);
-        jTextArea1.setRows(5);
-        jScrollPane1.setViewportView(jTextArea1);
-
         jButton1.setText("Gửi");
         jButton1.addActionListener(this::jButton1ActionPerformed);
 
+        // Khởi tạo các combobox
+        jComboBox1 = new JComboBox<>();
         jComboBox1.addActionListener(this::jComboBox1ActionPerformed);
 
-        jLabel1.setText("Chọn người nhân");
-
-        jLabel2.setText("Nhập tin nhắn");
-
+        // Khởi tạo các label
+        jLabel1 = new JLabel();
+        jLabel1.setText("Chọn người nhận");
+        jLabel2 = new JLabel();
+        jLabel2.setText("Danh sách online");
+        jLabel3 = new JLabel();
         jLabel3.setFont(new java.awt.Font("Tahoma", 1, 12));
-        jLabel3.setHorizontalAlignment(SwingConstants.CENTER);
         jLabel3.setText("{Người nhận}");
 
-        jPanel2.add(jLabel3);
-        jPanel2.add(jScrollPane1);
-        jPanel2.add(jScrollPane2);
-        jPanel2.add(jLabel1);
-        jPanel2.add(jComboBox1);
-        jPanel2.add(jLabel2);
-        jPanel2.add(jTextField1);
-        jPanel2.add(jButton1);
+        // Khởi tạo các textarea
+        jTextArea1 = new JTextArea(10, 20);
+        jTextArea2 = new JTextArea();
 
+        jTextArea1.setEditable(false);
+        jTextArea2.setEditable(false);
 
-        jTabbedPane1.addTab("Nhắn tin", jPanel2);
+        // Khởi tạo các textfield
+        jTextField1 = new JTextField(30);
+
+        // Khởi tạo các panel
+        jPanel1 = new JPanel();
+        jPanel1.setLayout(new FlowLayout(FlowLayout.LEFT));
+        jPanel2 = new JPanel();
+        jPanel2.setLayout(new BorderLayout());
+        jPanel22 = new JPanel();
+        jPanel22.setLayout(new FlowLayout(FlowLayout.CENTER));
+        jPanel3 = new JPanel();
+        jPanel3.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+        // Thêm các component vào panel
+        jPanel1.add(jLabel1);
+        jPanel1.add(jComboBox1);
+
+        jPanel22.add(jLabel2);
+        jPanel2.add(jPanel22, BorderLayout.NORTH);
+        jPanel2.add(new JScrollPane(jTextArea2), BorderLayout.CENTER);
+        jPanel2.add(new JLabel("     "), BorderLayout.SOUTH);
+        jPanel2.add(new JLabel("     "), BorderLayout.EAST);
+        jPanel2.add(new JLabel("     "), BorderLayout.WEST);
+
+        jPanel3.add(jTextField1);
+        jPanel3.add(jButton1);
+        jPanel3.add(jLabel3);
+
+        // Thêm các panel vào chatPanel
+        chatPanel.add(new JScrollPane(jTextArea1), BorderLayout.CENTER);
+        chatPanel.add(jPanel1, BorderLayout.NORTH);
+        chatPanel.add(jPanel2, BorderLayout.EAST);
+        chatPanel.add(jPanel3, BorderLayout.SOUTH);
+        chatPanel.add(new JLabel("     "), BorderLayout.WEST);
+
+        // Thêm JTabbedPane vào BorderLayout.CENTER
         add(jTabbedPane1, BorderLayout.CENTER);
 
+        // Tạo JFrame
         pack();
     }
+
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
         String messageContent = jTextField1.getText();
         if (messageContent.isEmpty()) {
