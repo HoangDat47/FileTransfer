@@ -8,7 +8,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Client extends JFrame {
+public class Client2 extends JFrame {
 
     private Thread thread;
     private BufferedWriter os;
@@ -26,7 +26,7 @@ public class Client extends JFrame {
     private JTextArea jTextArea1, jTextArea2;
     private JTextField jTextField1;
 
-    public Client() {
+    public Client2() {
         initComponents();
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
@@ -173,7 +173,7 @@ public class Client extends JFrame {
                     is = new BufferedReader(new InputStreamReader(socketOfClient.getInputStream()));
 
                     //gui ID len server
-                    write("get-1");
+                    write("get-2");
 
                     String message;
                     while (true) {
@@ -242,6 +242,6 @@ public class Client extends JFrame {
     }
 
     public static void main(String args[]) {
-        new Client();
+        new Client2();
     }
 }
