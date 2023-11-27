@@ -8,7 +8,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CClient extends JFrame {
+public class Client extends JFrame {
 
     private Thread thread;
     private BufferedWriter os;
@@ -26,7 +26,7 @@ public class CClient extends JFrame {
     private JTextArea jTextArea1, jTextArea2;
     private JTextField jTextField1;
 
-    public CClient() {
+    public Client() {
         initComponents();
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
@@ -238,6 +238,6 @@ public class CClient extends JFrame {
     }
 
     public static void main(String args[]) {
-        new CClient();
+        new Client();
     }
 }
