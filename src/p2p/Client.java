@@ -5,7 +5,6 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
-import java.io.File;
 import java.util.HashMap;
 
 import static p2p.FileInfo.sendFileList;
@@ -121,7 +120,7 @@ public class Client {
     private JPanel createFileSharingPanel() {
         fileSharingPanel = new JPanel(new BorderLayout());
 
-        String f = "C:\\Users\\Admin\\Desktop\\share\\" + node.getName();
+        String f = "src/share/" + node.getName();
         sendFileList(f, node.getName());
 
 
