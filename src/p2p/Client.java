@@ -5,7 +5,10 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.io.File;
 import java.util.HashMap;
+
+import static p2p.FileInfo.sendFileList;
 
 public class Client {
     private Node node;
@@ -20,6 +23,7 @@ public class Client {
     private HashMap<String, JTextArea> privateChats;
     private JScrollPane currentPrivateChatScrollPane;
     private JPanel privateChatPanel;
+    private JPanel fileSharingPanel;
 
     public Client() throws IOException {
         initComponents();
@@ -58,9 +62,11 @@ public class Client {
 
         JPanel generalChat = createGeneralChatPanel();
         JPanel privateChatPanel = createPrivateChatPanel();
+        JPanel fileSharingPanel = createFileSharingPanel();
 
         tabbedPane.add("General", generalChat);
         tabbedPane.add("Private", privateChatPanel);
+        tabbedPane.add("File Sharing", fileSharingPanel);
 
         return tabbedPane;
     }
@@ -110,6 +116,16 @@ public class Client {
         privateChatPanel.add(bottomSendPanel, BorderLayout.SOUTH);
 
         return privateChatPanel;
+    }
+
+    private JPanel createFileSharingPanel() {
+        fileSharingPanel = new JPanel(new BorderLayout());
+
+        String f = "C:\\Users\\Admin\\Desktop\\share\\" + node.getName();
+        sendFileList(f, node.getName());
+
+
+        return fileSharingPanel;
     }
 
     private void initListeners() {
