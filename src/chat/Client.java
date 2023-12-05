@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Client extends JFrame {
-
     private Thread thread;
     private BufferedWriter os;
     private BufferedReader is;
