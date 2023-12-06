@@ -11,7 +11,6 @@ public class Node {
     private HashMap<String, Integer> nodes;
     private MulticastSocket multicastSocket;
     private InetAddress group;
-    private VectorClock vc;
     private int port;
     private Client client;
 
@@ -20,7 +19,6 @@ public class Node {
         this.socket = new DatagramSocket();
         this.nodes = new HashMap<>();
         this.port = socket.getLocalPort();
-        this.vc = new VectorClock(name);
         this.multicastSocket = new MulticastSocket();
         this.group = null;
         this.client = client;
@@ -56,13 +54,13 @@ public class Node {
 
     public void connect() throws IOException {
         client.updateChatArea("#Connecting to the network...");
-        Message newMessage = new Message("CONNECTION_REQUEST", name, null, null);
+        Message newMessage = new Message("CONNECTION_REQUEST", name, null);
         Message.sendMessageObject(this.socket, newMessage,5000);
     }
 
     public void disconnect() throws IOException {
         System.out.println("#Disconnecting from the network...");
-        Message newMessage = new Message("DISCONNECT", name, Utils.hashMapToString(nodes), null);
+        Message newMessage = new Message("DISCONNECT", name, Utils.hashMapToString(nodes));
         Message.sendMessageObject(this.socket, newMessage,5000);
         Message.broadcast(this.multicastSocket, newMessage, this.group);
         this.multicastSocket.close();
@@ -82,7 +80,7 @@ public class Node {
                         case "CONNECTION_DENIED" -> client.showErrorMessage(msgObj.content());
                         case "PRIVATE_MESSAGE" -> client.updatePrivateChatArea(msgObj.sender() + ": " + msgObj.content(), msgObj.sender());
                         case "MESSAGE" -> client.updateChatArea(msgObj.sender() + ": " + msgObj.content());
-                        default -> System.out.println("#SOMETHING WENT WRONG...");
+                        default -> System.out.println("#SOMETHING WENT WRONG1...");
                     }
                 }
             } catch (IOException e) {
@@ -97,7 +95,7 @@ public class Node {
         setMultiCastSocket(Integer.parseInt(split[2]));
         joinMulticastGroup();
         updateNodesFromMessage(split[0]);
-        Message msg = new Message("NEW_PEER", this.name, Utils.hashMapToString(nodes), vc);
+        Message msg = new Message("NEW_PEER", this.name, Utils.hashMapToString(nodes));
         Message.broadcast(this.multicastSocket, msg, this.group);
         client.updateChatArea("#You are now connected to the network\n");
         client.updateNodeList();
@@ -126,6 +124,12 @@ public class Node {
                         case "MULTICAST_MESSAGE" -> {
                             if (!msgObj.sender().equals(this.name)) {
                                 client.updateChatArea(msgObj.sender() + ":" + msgObj.content());
+                            }
+                        }
+                        case "FILE_INFO_LIST" -> {
+                            if(!msgObj.sender().equals(this.name)) {
+                                client.updateChatArea("#" + msgObj.sender() + " has shared some files with you");
+                                client.updateFileList(msgObj.content());
                             }
                         }
                         case "NEW_PEER" -> {

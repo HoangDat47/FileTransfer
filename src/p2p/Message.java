@@ -10,29 +10,15 @@ public class Message {
     private String type;
     private String sender;
     private String content;
-    private VectorClock vectorClock;
 
-    public Message(String type, String sender, String content, VectorClock vectorClock) {
+    public Message(String type, String sender, String content) {
         this.type = type;
         this.sender = sender;
         this.content = content;
-        this.vectorClock = vectorClock;
     }
 
     public String type() {
         return type;
-    }
-
-    public String getSender() {
-        return sender;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public VectorClock getVectorClock() {
-        return vectorClock;
     }
 
     public String content() {
@@ -44,7 +30,7 @@ public class Message {
     }
 
     public String toString() {
-        return type + ":" + sender + ":" + content + ":" + vectorClock;
+        return type + ":" + sender + ":" + content;
     }
 
     public static Message fromString(String message) {
@@ -52,9 +38,7 @@ public class Message {
         String type = parts[0];
         String sender = parts[1];
         String content = parts[2];
-        if (parts[3].equals("null")) return new Message(type, sender, content, null);
-        VectorClock vectorClock = VectorClock.fromString(parts[3]);
-        return new Message(type, sender, content, vectorClock);
+        return new Message(type, sender, content);
     }
 
     public static void sendMessageObject(DatagramSocket socket, Message message, int portDestination) throws IOException {

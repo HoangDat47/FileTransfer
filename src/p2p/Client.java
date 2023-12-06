@@ -5,9 +5,9 @@ import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
+import java.io.File;
 import java.util.HashMap;
-
-import static p2p.FileInfo.sendFileList;
+import java.util.List;
 
 public class Client {
     private Node node;
@@ -16,10 +16,11 @@ public class Client {
     private JButton sendButton;
     private JButton sendPrivateButton;
     private JTextField privateInputField;
-    private JButton exitButton;
+    private JButton exitButton, updateButton;
     private JList<String> nodeList;
     private JComboBox<String> comboBox;
     private HashMap<String, JTextArea> privateChats;
+    public static List<FileInfo> fileInfoList;
     private JScrollPane currentPrivateChatScrollPane;
     private JPanel privateChatPanel;
     private JPanel fileSharingPanel;
@@ -38,7 +39,7 @@ public class Client {
         comboBox = new JComboBox<>();
         currentPrivateChatScrollPane = new JScrollPane();
 
-        JFrame frame = new JFrame("File - " + name);
+        JFrame frame = new JFrame("File transfer - " + name);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(800, 600);
 
@@ -119,10 +120,9 @@ public class Client {
 
     private JPanel createFileSharingPanel() {
         fileSharingPanel = new JPanel(new BorderLayout());
+        updateButton = new JButton("Update");
 
-        String f = "src/share/" + node.getName();
-        sendFileList(f, node.getName());
-
+        fileSharingPanel.add(updateButton, BorderLayout.NORTH);
 
         return fileSharingPanel;
     }
@@ -158,13 +158,44 @@ public class Client {
         sendButton.addActionListener(e -> sendGeneralMessage());
         sendPrivateButton.addActionListener(e -> sendPrivateMessage());
         comboBox.addActionListener(e -> updatePrivateChat());
+        updateButton.addActionListener(e -> fileManager());
+    }
+
+    private void fileManager() {
+        String f = "src/share/" + node.getName();
+        //neu thu muc chua ton tai thi tao moi
+        if (!new File(f).exists()) {
+            new File(f).mkdirs();
+        } else {
+            try {
+                FileInfo.getFileInsideFolder(f, node.getName());
+                if (fileInfoList != null && !fileInfoList.isEmpty()) {
+                    String fileInfoString = Utils.listToString(fileInfoList, "\\|");
+                    System.out.println("File Info String: " + fileInfoString); // Debugging output
+                    Message fileInfoMessage = new Message("FILE_INFO_LIST", node.getName(), fileInfoString);
+                    Message.broadcast(node.getMulticastSocket(), fileInfoMessage, node.getGroup());
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void updateFileList(String content) {
+        //in ra noi dung cua content
+        System.out.println("Content: " + content);
+        fileInfoList = Utils.stringToList(content, "\\|");
+        //in ra fileList
+        for (FileInfo fileInfo : fileInfoList) {
+            System.out.println(fileInfo.toString("\\|"));
+        }
     }
 
     private void sendGeneralMessage() {
         String message = inputField.getText();
         if (!message.isEmpty() && !message.contains(":")) {
             try {
-                Message msg = new Message("MULTICAST_MESSAGE", node.getName(), message, null);
+                Message msg = new Message("MULTICAST_MESSAGE", node.getName(), message);
                 Message.broadcast(node.getMulticastSocket(), msg, node.getGroup());
                 chatArea.append("You: " + message + "\n");
             } catch (IOException ex) {
@@ -179,7 +210,7 @@ public class Client {
         String recipient = (String) comboBox.getSelectedItem();
         if (!message.isEmpty() && !message.contains(":")) {
             try {
-                Message msg = new Message("PRIVATE_MESSAGE", node.getName(), message, null);
+                Message msg = new Message("PRIVATE_MESSAGE", node.getName(), message);
                 Message.sendMessageObject(node.getSocket(), msg, node.getNodes().get(recipient));
                 privateChats.get(recipient).append("You: " + message + "\n");
             } catch (IOException ex) {

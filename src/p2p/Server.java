@@ -45,13 +45,13 @@ public class Server {
     }
 
     private void handleNetworkFull(DatagramPacket packet, Message msgObj) throws IOException {
-        Message res = new Message("CONNECTION_DENIED", "Server", "Network is full, please try again later", null);
+        Message res = new Message("CONNECTION_DENIED", "Server", "Network is full, please try again later");
         Message.sendMessageObject(this.socket, res, packet.getPort());
         System.out.println("#" + msgObj.sender() + " has been denied access");
     }
 
     private void handleNameAlreadyTaken(DatagramPacket packet, Message msgObj) throws IOException  {
-        Message res = new Message("CONNECTION_DENIED", "Server", "Name already taken, find another name", null);
+        Message res = new Message("CONNECTION_DENIED", "Server", "Name already taken, find another name");
         Message.sendMessageObject(this.socket, res, packet.getPort());
         System.out.println("#" + msgObj.sender() + " has been denied access");
     }
@@ -61,7 +61,7 @@ public class Server {
         int multicastPort = 1234;
         nodes.put(msgObj.sender(), packet.getPort());
         String stringToSend = Utils.hashMapToString(nodes) + group + "/" + multicastPort;
-        Message res = new Message("CONNECTION_ACCEPTED", "Server", stringToSend, null);
+        Message res = new Message("CONNECTION_ACCEPTED", "Server", stringToSend);
         Message.sendMessageObject(this.socket, res, packet.getPort());
         System.out.println("#" + msgObj.sender() + " has joined the network");
         System.out.println("Nodes: " + nodes);
