@@ -36,10 +36,10 @@ public class  Utils {
                 String[] parts = fileInfoStr.split(delimiter);
                 if (parts.length >= 3) {
                     String fileName = parts[0].trim().replace("\\", ""); // Trim and remove backslashes
-                    System.out.println(fileName);
+                    //System.out.println(fileName);
 
                     String fileOwner = parts[1].trim().replace("\\", "");
-                    System.out.println(fileOwner);
+                    //System.out.println(fileOwner);
 
                     // Check if the third part is a valid number
                     try {
@@ -49,7 +49,7 @@ public class  Utils {
                         }
 
                         // in ra fileSize
-                        System.out.println(fileSize);
+                        //System.out.println(fileSize);
 
                         // Tạo đối tượng FileInfo và thêm vào danh sách
                         FileInfo fileInfo = new FileInfo(fileName, fileOwner, fileSize);

@@ -2,6 +2,7 @@ package p2p;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 public class FileInfo {
     private String fileName;
@@ -15,38 +16,39 @@ public class FileInfo {
         this.fileSize = fileSize;
     }
 
-    /*public static FileInfo fromString(String message) {
-        String[] parts = message.split(":");
-        String type = parts[0];
-        String fileName = parts[1];
-        String fileOwner = parts[2];
-        long fileSize = Long.parseLong(parts[3]);
-        return new FileInfo(type, fileName, fileOwner, fileSize);
-    }*/
-
-
-    public static void getFileInsideFolder(String path, String fileOwner) {
+    public static List<FileInfo> getFileInsideFolder(String path, String fileOwner) {
+        List<FileInfo> fileInfoList = new ArrayList<>();
         File folder = new File(path);
         File[] files = folder.listFiles();
-        if (files != null) {
-            // Tạo danh sách để lưu trữ thông tin về file
-            Client.fileInfoList = new ArrayList<>();
 
+        if (files != null) {
             for (File file : files) {
                 if (file.isFile()) {
-                    // Lấy thông tin về file
+                    // Get information about the file
                     String fileName = file.getName();
                     int fileSize = (int) file.length();
 
-                    // Tạo đối tượng FileInfo và thêm vào danh sách
+                    // Create FileInfo object and add it to the list
                     FileInfo fileInfo = new FileInfo(fileName, fileOwner, fileSize);
-                    Client.fileInfoList.add(fileInfo);
+                    fileInfoList.add(fileInfo);
 
                     System.out.println(fileInfo);
                 }
             }
         }
+        return fileInfoList;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FileInfo fileInfo = (FileInfo) o;
+        return fileSize == fileInfo.fileSize &&
+                fileName.equals(fileInfo.fileName) &&
+                fileOwner.equals(fileInfo.fileOwner);
+    }
+
     public String toString(String delimiter) {
         return fileName + delimiter  + fileOwner + delimiter  + fileSize;
     }

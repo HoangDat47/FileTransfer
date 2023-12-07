@@ -6,6 +6,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -16,11 +17,11 @@ public class Client {
     private JButton sendButton;
     private JButton sendPrivateButton;
     private JTextField privateInputField;
-    private JButton exitButton, updateButton;
+    private JButton exitButton, updateButton, printListButton;
     private JList<String> nodeList;
     private JComboBox<String> comboBox;
     private HashMap<String, JTextArea> privateChats;
-    public static List<FileInfo> fileInfoList;
+    private List<FileInfo> fileInfoList;
     private JScrollPane currentPrivateChatScrollPane;
     private JPanel privateChatPanel;
     private JPanel fileSharingPanel;
@@ -28,6 +29,8 @@ public class Client {
     public Client() throws IOException {
         initComponents();
         initListeners();
+        fileInfoList = new ArrayList<>();
+        updateLocalFileList();
         node.connect();
         node.startListening();
     }
@@ -121,8 +124,10 @@ public class Client {
     private JPanel createFileSharingPanel() {
         fileSharingPanel = new JPanel(new BorderLayout());
         updateButton = new JButton("Update");
+        printListButton = new JButton("Print List");
 
         fileSharingPanel.add(updateButton, BorderLayout.NORTH);
+        fileSharingPanel.add(printListButton, BorderLayout.CENTER);
 
         return fileSharingPanel;
     }
@@ -159,17 +164,45 @@ public class Client {
         sendPrivateButton.addActionListener(e -> sendPrivateMessage());
         comboBox.addActionListener(e -> updatePrivateChat());
         updateButton.addActionListener(e -> fileManager());
+        printListButton.addActionListener(e -> printList());
     }
 
+    private void printList() {
+        System.out.println("--------------------------");
+        for (FileInfo fileInfo : fileInfoList) {
+            System.out.println(fileInfo.toString("\\|"));
+        }
+    }
+
+    private void updateLocalFileList() {
+        String localFolderPath = "src/share/" + node.getName();
+        fileInfoList = FileInfo.getFileInsideFolder(localFolderPath, node.getName());
+    }
+
+
     private void fileManager() {
-        String f = "src/share/" + node.getName();
-        //neu thu muc chua ton tai thi tao moi
-        if (!new File(f).exists()) {
-            new File(f).mkdirs();
+        String folderPath = "src/share/" + node.getName();
+
+        if (!new File(folderPath).exists()) {
+            new File(folderPath).mkdirs();
         } else {
             try {
-                FileInfo.getFileInsideFolder(f, node.getName());
-                if (fileInfoList != null && !fileInfoList.isEmpty()) {
+                // Retrieve file information and update the local list
+                List<FileInfo> receivedFiles = FileInfo.getFileInsideFolder(folderPath, node.getName());
+
+                for (FileInfo receivedFile : receivedFiles) {
+                    int existingIndex = fileInfoList.indexOf(receivedFile);
+
+                    if (existingIndex != -1) {
+                        // Update the existing entry
+                        fileInfoList.set(existingIndex, receivedFile);
+                    } else {
+                        // Add the new entry to the list
+                        fileInfoList.add(receivedFile);
+                    }
+                }
+
+                if (!fileInfoList.isEmpty()) {
                     String fileInfoString = Utils.listToString(fileInfoList, "\\|");
                     System.out.println("File Info String: " + fileInfoString); // Debugging output
                     Message fileInfoMessage = new Message("FILE_INFO_LIST", node.getName(), fileInfoString);
@@ -181,15 +214,26 @@ public class Client {
         }
     }
 
+
     public void updateFileList(String content) {
-        //in ra noi dung cua content
-        System.out.println("Content: " + content);
-        fileInfoList = Utils.stringToList(content, "\\|");
-        //in ra fileList
-        for (FileInfo fileInfo : fileInfoList) {
-            System.out.println(fileInfo.toString("\\|"));
+        List<FileInfo> receivedFiles = Utils.stringToList(content, "\\|");
+
+        for (FileInfo receivedFile : receivedFiles) {
+            int existingIndex = fileInfoList.indexOf(receivedFile);
+
+            if (existingIndex != -1) {
+                // Update the existing entry
+                fileInfoList.set(existingIndex, receivedFile);
+            } else {
+                // Add the new entry to the list
+                fileInfoList.add(receivedFile);
+            }
         }
+
+        // Print or display the updated file list
+        System.out.println("Updated File List: " + Utils.listToString(fileInfoList, "\\|"));
     }
+
 
     private void sendGeneralMessage() {
         String message = inputField.getText();
