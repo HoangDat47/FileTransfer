@@ -16,6 +16,8 @@ public class FileInfo {
         this.fileSize = fileSize;
     }
 
+
+
     public static List<FileInfo> getFileInsideFolder(String path, String fileOwner) {
         List<FileInfo> fileInfoList = new ArrayList<>();
         File folder = new File(path);
@@ -51,5 +53,17 @@ public class FileInfo {
 
     public String toString(String delimiter) {
         return fileName + delimiter  + fileOwner + delimiter  + fileSize;
+    }
+
+    public String getFileName() {
+        return fileName;
+    }
+
+    public String getFileOwner() {
+        return fileOwner;
+    }
+
+    public int getFileSize() {
+        return fileSize;
     }
 }

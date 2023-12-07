@@ -1,6 +1,7 @@
 package p2p;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
@@ -14,17 +15,16 @@ public class Client {
     private Node node;
     private JTextArea chatArea;
     private JTextField inputField;
-    private JButton sendButton;
-    private JButton sendPrivateButton;
+    private JButton sendButton, sendPrivateButton, exitButton, updateButton, printListButton, refreshButton;
     private JTextField privateInputField;
-    private JButton exitButton, updateButton, printListButton;
     private JList<String> nodeList;
     private JComboBox<String> comboBox;
     private HashMap<String, JTextArea> privateChats;
     private List<FileInfo> fileInfoList;
     private JScrollPane currentPrivateChatScrollPane;
     private JPanel privateChatPanel;
-    private JPanel fileSharingPanel;
+    private DefaultTableModel tableModel;
+    private JTable tableFileSharing;
 
     public Client() throws IOException {
         initComponents();
@@ -122,14 +122,47 @@ public class Client {
     }
 
     private JPanel createFileSharingPanel() {
-        fileSharingPanel = new JPanel(new BorderLayout());
+        JPanel fileSharingPanel = new JPanel(new BorderLayout());
+        JPanel btnPanel = new JPanel(new FlowLayout());
         updateButton = new JButton("Update");
         printListButton = new JButton("Print List");
+        refreshButton = new JButton("Refresh");
 
-        fileSharingPanel.add(updateButton, BorderLayout.NORTH);
-        fileSharingPanel.add(printListButton, BorderLayout.CENTER);
+        btnPanel.add(updateButton);
+        btnPanel.add(printListButton);
+        btnPanel.add(refreshButton);
+        fileSharingPanel.add(btnPanel, BorderLayout.NORTH);
+        fileSharingPanel.add(new JScrollPane(createFileSharingTable()), BorderLayout.CENTER);
 
         return fileSharingPanel;
+    }
+
+    private JTable createFileSharingTable() {
+        tableModel = new DefaultTableModel();
+        tableFileSharing = new JTable(tableModel);
+
+        tableModel.addColumn("File Name");
+        tableModel.addColumn("File owner");
+        tableModel.addColumn("File size");
+
+        return tableFileSharing;
+    }
+
+    private void refreshTable() {
+        clearTable();
+        for (FileInfo fileInfo : fileInfoList) {
+            tableModel.addRow(new Object[]{fileInfo.getFileName(), fileInfo.getFileOwner(), fileInfo.getFileSize()});
+        }
+    }
+
+    private void clearTable() {
+        // Lấy số lượng dòng hiện tại trong bảng
+        int rowCount = tableModel.getRowCount();
+
+        // Xóa tất cả các dòng từ cuối cùng đến đầu
+        for (int i = rowCount - 1; i >= 0; i--) {
+            tableModel.removeRow(i);
+        }
     }
 
     private void initListeners() {
@@ -165,6 +198,7 @@ public class Client {
         comboBox.addActionListener(e -> updatePrivateChat());
         updateButton.addActionListener(e -> fileManager());
         printListButton.addActionListener(e -> printList());
+        refreshButton.addActionListener(e -> refreshTable());
     }
 
     private void printList() {
@@ -204,7 +238,7 @@ public class Client {
 
                 if (!fileInfoList.isEmpty()) {
                     String fileInfoString = Utils.listToString(fileInfoList, "\\|");
-                    System.out.println("File Info String: " + fileInfoString); // Debugging output
+                    //System.out.println("File Info String: " + fileInfoString); // Debugging output
                     Message fileInfoMessage = new Message("FILE_INFO_LIST", node.getName(), fileInfoString);
                     Message.broadcast(node.getMulticastSocket(), fileInfoMessage, node.getGroup());
                 }
@@ -231,7 +265,7 @@ public class Client {
         }
 
         // Print or display the updated file list
-        System.out.println("Updated File List: " + Utils.listToString(fileInfoList, "\\|"));
+        //System.out.println("Updated File List: " + Utils.listToString(fileInfoList, "\\|"));
     }
 
 
