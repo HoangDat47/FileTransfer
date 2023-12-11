@@ -45,7 +45,7 @@ public class UDPFileClient {
 
     private static boolean checkFile(String fileName) {
         boolean error = false;
-        File file = new File("src/share/" + fileName);
+        File file = new File("src/share/dat/" + fileName);
         int maxLength = 64 * 1024;
         int fileLength = (int) file.length();
 
@@ -67,8 +67,6 @@ public class UDPFileClient {
         } else if (fileLength < 0) {
             error = true;
             System.out.println("File khong hop le");
-        } else {
-            System.out.println("File hop le");
         }
         return error;
     }

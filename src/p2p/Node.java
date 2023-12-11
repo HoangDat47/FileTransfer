@@ -80,6 +80,9 @@ public class Node {
                         case "CONNECTION_DENIED" -> client.showErrorMessage(msgObj.content());
                         case "PRIVATE_MESSAGE" -> client.updatePrivateChatArea(msgObj.sender() + ": " + msgObj.content(), msgObj.sender());
                         case "MESSAGE" -> client.updateChatArea(msgObj.sender() + ": " + msgObj.content());
+                        //dat has requested file hai.txt
+                        case "REQUEST_FILE" -> client.sendingFile(msgObj.content(), nodes.get(msgObj.sender()));
+                        case "SEND_FILE" -> client.receivingFile(msgObj.content(), nodes.get(msgObj.sender()));
                         default -> System.out.println("#SOMETHING WENT WRONG1...");
                     }
                 }

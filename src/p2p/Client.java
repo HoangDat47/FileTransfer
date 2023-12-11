@@ -5,8 +5,14 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.File;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -134,6 +140,45 @@ public class Client {
         fileSharingPanel.add(btnPanel, BorderLayout.NORTH);
         fileSharingPanel.add(new JScrollPane(createFileSharingTable()), BorderLayout.CENTER);
 
+        //thêm sự kiện click vào 1 hàng trong bảng
+        tableFileSharing.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                int selectedRow = tableFileSharing.getSelectedRow();
+                if (selectedRow != -1) {
+                    // Lấy thông tin từ hàng được chọn
+                    String fileName = (String) tableModel.getValueAt(selectedRow, 0);
+                    String fileOwner = (String) tableModel.getValueAt(selectedRow, 1);
+                    String fileSize = (String) tableModel.getValueAt(selectedRow, 2);
+                    String status = (String) tableModel.getValueAt(selectedRow, 3);
+
+                    if (status == "Đã tải về") {
+                        // Hiển thị thông tin hoặc thực hiện các hành động khác tùy thuộc vào nhu cầu của bạn
+                        JOptionPane.showMessageDialog(null, "Selected File:\n" +
+                                "Name: " + fileName + "\n" +
+                                "Owner: " + fileOwner + "\n" +
+                                "Size: " + fileSize + "\n" +
+                                "Status: " + status);
+                    } else {
+                        // Hien len thong bao ban co muon tai file ve khong neu co thi gui yeu cau lay file
+                        int result = JOptionPane.showConfirmDialog(null, "Selected File:\n" +
+                                "Name: " + fileName + "\n" +
+                                "Owner: " + fileOwner + "\n" +
+                                "Size: " + fileSize + "\n" +
+                                "Status: " + status + "\n" +
+                                "Do you want to download this file?", "Download", JOptionPane.YES_NO_OPTION);
+                        if (result == JOptionPane.YES_OPTION) {
+                            Message requestFileMessage = new Message("REQUEST_FILE", node.getName(), fileName);
+                            try {
+                                Message.sendMessageObject(node.getSocket(), requestFileMessage, node.getNodes().get(fileOwner));
+                            } catch (IOException ex) {
+                                ex.printStackTrace();
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
         return fileSharingPanel;
     }
 
@@ -144,6 +189,7 @@ public class Client {
         tableModel.addColumn("File Name");
         tableModel.addColumn("File owner");
         tableModel.addColumn("File size");
+        tableModel.addColumn("Status");
 
         return tableFileSharing;
     }
@@ -153,7 +199,8 @@ public class Client {
         for (FileInfo fileInfo : fileInfoList) {
             int fileSize = fileInfo.getFileSize();
             String fileSizeString = FileInfo.formatBytes(fileSize);
-            tableModel.addRow(new Object[]{fileInfo.getFileName(), fileInfo.getFileOwner(), fileSizeString});
+            String status = FileInfo.checkFileInsideFolder("src/share/" + node.getName(), fileInfo.getFileName());
+            tableModel.addRow(new Object[]{fileInfo.getFileName(), fileInfo.getFileOwner(), fileSizeString, status});
         }
     }
 
@@ -215,7 +262,6 @@ public class Client {
         fileInfoList = FileInfo.getFileInsideFolder(localFolderPath, node.getName());
     }
 
-
     private void fileManager() {
         String folderPath = "src/share/" + node.getName();
 
@@ -250,7 +296,6 @@ public class Client {
         }
     }
 
-
     public void updateFileList(String content) {
         List<FileInfo> receivedFiles = Utils.stringToList(content, "\\|");
 
@@ -269,7 +314,6 @@ public class Client {
         // Print or display the updated file list
         //System.out.println("Updated File List: " + Utils.listToString(fileInfoList, "\\|"));
     }
-
 
     private void sendGeneralMessage() {
         String message = inputField.getText();
@@ -292,6 +336,7 @@ public class Client {
             try {
                 Message msg = new Message("PRIVATE_MESSAGE", node.getName(), message);
                 Message.sendMessageObject(node.getSocket(), msg, node.getNodes().get(recipient));
+                System.out.println("Sending private message to " + node.getNodes().get(recipient));
                 privateChats.get(recipient).append("You: " + message + "\n");
             } catch (IOException ex) {
                 ex.printStackTrace();
@@ -346,6 +391,32 @@ public class Client {
 
     public void updateChatArea(String message) {
         chatArea.append(message + "\n");
+    }
+
+    public void sendingFile(String fileName, int recipientPort) {
+        //tao mot thread moi de gui file su dung ham sendFile o FileInfo
+        new Thread(() -> {
+            //gui thong bao cho nguoi nhan biet la se gui file
+            Message msg = new Message("SEND_FILE", node.getName(), fileName);
+            try {
+                Message.sendMessageObject(node.getSocket(), msg, recipientPort);
+                // Introduce a delay or synchronization here to ensure the recipient processes the message
+                Thread.sleep(1000); // Add an appropriate delay (1 second in this example)
+            } catch (IOException | InterruptedException e) {
+                e.printStackTrace();
+            }
+
+            // Start the file transfer after a delay or synchronization
+            FileInfo.sendFile(node.getSocket(),"src/share/" + node.getName() + "/" + fileName, recipientPort);
+
+        }).start();
+    }
+
+    public void receivingFile(String fileName, int senderPort) {
+        //tao mot thread moi de nhan file su dung ham receiveFile o FileInfo
+        new Thread(() -> {
+            FileInfo.receiveFile("src/share/" + node.getName() + "/" + fileName, senderPort);
+        }).start();
     }
 
     private String showUsernameDialog() {
