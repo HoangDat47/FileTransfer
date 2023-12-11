@@ -151,7 +151,9 @@ public class Client {
     private void refreshTable() {
         clearTable();
         for (FileInfo fileInfo : fileInfoList) {
-            tableModel.addRow(new Object[]{fileInfo.getFileName(), fileInfo.getFileOwner(), fileInfo.getFileSize()});
+            int fileSize = fileInfo.getFileSize();
+            String fileSizeString = FileInfo.formatBytes(fileSize);
+            tableModel.addRow(new Object[]{fileInfo.getFileName(), fileInfo.getFileOwner(), fileSizeString});
         }
     }
 

@@ -15,10 +15,14 @@ public class UDPFileClient {
         try {
             DatagramSocket socket = new DatagramSocket();
             InetAddress serverAddress = InetAddress.getByName("localhost");
-
-            System.out.println("Nhap ten file: ");
             Scanner scn = new Scanner(System.in);
-            String fileName = scn.nextLine();
+            String fileName = "";
+
+            do {
+                System.out.print("Nhap ten file: ");
+                fileName = scn.nextLine();
+            } while (checkFile(fileName));
+
             //gui yeu cau lay file
             String request = "READ " + fileName;
             byte[] requestBytes = request.getBytes();
@@ -37,5 +41,35 @@ public class UDPFileClient {
         } catch (IOException e) {
             System.err.println("Loi client: " + e.getMessage());
         }
+    }
+
+    private static boolean checkFile(String fileName) {
+        boolean error = false;
+        File file = new File("src/share/" + fileName);
+        int maxLength = 64 * 1024;
+        int fileLength = (int) file.length();
+
+        if (fileLength > maxLength) {
+            error = true;
+            System.out.println("File qua lon");
+        } else if (!file.exists()) {
+            error = true;
+            System.out.println("File khong ton tai");
+        } else if (!file.canRead()) {
+            error = true;
+            System.out.println("Khong the doc file");
+        } else if (file.isDirectory()) {
+            error = true;
+            System.out.println("Khong the gui thu muc");
+        } else if (fileLength == 0) {
+            error = true;
+            System.out.println("File rong");
+        } else if (fileLength < 0) {
+            error = true;
+            System.out.println("File khong hop le");
+        } else {
+            System.out.println("File hop le");
+        }
+        return error;
     }
 }
