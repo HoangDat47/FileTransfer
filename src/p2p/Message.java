@@ -55,27 +55,4 @@ public class Message {
         DatagramPacket packet = new DatagramPacket(buffer, buffer.length, groupAddress, 1234);
         socket.send(packet);
     }
-
-    //tao ham sendFile
-    public static void sendFile(DatagramSocket socket, String filePath, int recipientPort) {
-        try {
-            File file = new File(filePath);
-            FileInputStream fileInputStream = new FileInputStream(file);
-            byte[] fileBytes = new byte[(int) file.length()];
-            fileInputStream.read(fileBytes);
-
-            InetAddress serverAddress = InetAddress.getByName("localhost");
-
-
-
-
-
-            //in ra path va port
-            System.out.println("Đã gửi file " + filePath + " đến " + serverAddress + ":" + recipientPort);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.err.println("Error sending file: " + e.getMessage());
-        }
-
-    }
 }

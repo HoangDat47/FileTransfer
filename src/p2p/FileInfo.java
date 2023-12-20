@@ -144,11 +144,29 @@ public class FileInfo {
             socket.receive(inputPacket);
             fos.write(inputPacket.getData(), 0, inputPacket.getLength());
             System.out.println("Da nhan file " + " tu server");
+            fos.close();
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Lỗi server: " + e.getMessage());
         }
     }
+
+    //tao ham hien thi tien trinh download bang progress bar
+    public static void showProgress(int percent) {
+        StringBuilder bar = new StringBuilder("[");
+        for (int i = 0; i < 50; i++) {
+            if (i < (percent / 2)) {
+                bar.append("=");
+            } else if (i == (percent / 2)) {
+                bar.append(">");
+            } else {
+                bar.append(" ");
+            }
+        }
+        bar.append("]   ").append(percent).append("%     ");
+        System.out.print("\r" + bar.toString());
+    }
+
 
     public String toString(String delimiter) {
         return fileName + delimiter  + fileOwner + delimiter  + fileSize;
