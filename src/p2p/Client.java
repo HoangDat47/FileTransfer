@@ -5,17 +5,12 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.File;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 public class Client {
     private Node node;
@@ -151,7 +146,7 @@ public class Client {
                     String fileSize = (String) tableModel.getValueAt(selectedRow, 2);
                     String status = (String) tableModel.getValueAt(selectedRow, 3);
 
-                    if (status == "Đã tải về") {
+                    if (Objects.equals(status, "Đã tải về")) {
                         // Hiển thị thông tin hoặc thực hiện các hành động khác tùy thuộc vào nhu cầu của bạn
                         JOptionPane.showMessageDialog(null, "Selected File:\n" +
                                 "Name: " + fileName + "\n" +
@@ -227,7 +222,7 @@ public class Client {
         inputField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     sendButton.doClick();
                 }
             }
@@ -236,7 +231,7 @@ public class Client {
         privateInputField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
                     sendPrivateButton.doClick();
                 }
             }
@@ -394,28 +389,24 @@ public class Client {
     }
 
     public void sendingFile(String fileName, int recipientPort) {
-        //tao mot thread moi de gui file su dung ham sendFile o FileInfo
-        new Thread(() -> {
-            //gui thong bao cho nguoi nhan biet la se gui file
-            Message msg = new Message("SEND_FILE", node.getName(), fileName);
-            try {
-                Message.sendMessageObject(node.getSocket(), msg, recipientPort);
-                // Introduce a delay or synchronization here to ensure the recipient processes the message
-                Thread.sleep(1000); // Add an appropriate delay (1 second in this example)
-            } catch (IOException | InterruptedException e) {
-                e.printStackTrace();
-            }
+        //gui thong bao cho nguoi nhan biet la se gui file
+        Message msg = new Message("SEND_FILE", node.getName(), fileName);
+        try {
+            Message.sendMessageObject(node.getSocket(), msg, recipientPort);
+            // Introduce a delay or synchronization here to ensure the recipient processes the message
+            Thread.sleep(1000); // Add an appropriate delay (1 second in this example)
+        } catch (IOException | InterruptedException e) {
+            e.printStackTrace();
+        }
 
-            // Start the file transfer after a delay or synchronization
-            FileInfo.sendFile(node.getSocket(),"src/share/" + node.getName() + "/" + fileName, recipientPort);
-
-        }).start();
+        // Start the file transfer after a delay or synchronization
+        FileInfo.sendFile(node.getSocket(), "src/share/" + node.getName() + "/" + fileName, recipientPort);
     }
 
     public void receivingFile(String fileName, int senderPort) {
         //tao mot thread moi de nhan file su dung ham receiveFile o FileInfo
         new Thread(() -> {
-            FileInfo.receiveFile("src/share/" + node.getName() + "/" + fileName, senderPort);
+            FileInfo.receiveFile(node.getSocket(), "src/share/" + node.getName() + "/" + fileName, senderPort);
         }).start();
     }
 

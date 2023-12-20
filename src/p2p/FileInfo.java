@@ -110,20 +110,23 @@ public class FileInfo {
     public static void sendFile(DatagramSocket socket, String filePath, int recipientPort) {
         try {
             File file = new File(filePath);
-            FileInputStream fis = new FileInputStream(file);
-            int fileLength = (int) file.length();
+            //neu file khong ton tai thi in ra thong bao
+            if (!file.exists()) {
+                System.out.println("File không tồn tại");
+            } else {
+                FileInputStream fis = new FileInputStream(file);
+                int fileLength = (int) file.length();
 
-            InetAddress serverAddress = InetAddress.getByName("localhost");
-            byte[] buffer = new byte[fileLength];
-
-            int bytesRead;
-            while ((bytesRead = fis.read(buffer)) != -1) {
-                DatagramPacket packet = new DatagramPacket(buffer, bytesRead, serverAddress, recipientPort);
+                InetAddress serverAddress = InetAddress.getByName("localhost");
+                byte[] buffer = new byte[fileLength];
+                fis.read(buffer);
+                DatagramPacket packet = new DatagramPacket(buffer, buffer.length, serverAddress, recipientPort);
                 socket.send(packet);
-            }
 
-            //in ra path va port
-            System.out.println("Đã gửi file " + filePath + " đến " + serverAddress + ":" + recipientPort);
+                //gui xong thi in ra path va port va dong file
+                System.out.println("Đã gửi file " + filePath + " đến " + serverAddress + ":" + recipientPort);
+                fis.close();
+            }
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Error sending file: " + e.getMessage());
@@ -132,19 +135,15 @@ public class FileInfo {
     }
 
     //tao ham receiveFile
-    public static void receiveFile(String filePath, int port) {
-        try (DatagramSocket socket = new DatagramSocket(port)) {
-            byte[] fileBytes = new byte[60000];
-            DatagramPacket packet = new DatagramPacket(fileBytes, fileBytes.length);
-            socket.receive(packet);
-            String fileName = new File(filePath).getName();
+    public static void receiveFile(DatagramSocket socket, String filePath, int port) {
+        try {
             File file = new File(filePath);
             FileOutputStream fos = new FileOutputStream(file);
             byte[] inputByte = new byte[60000];
             DatagramPacket inputPacket = new DatagramPacket(inputByte, inputByte.length);
             socket.receive(inputPacket);
             fos.write(inputPacket.getData(), 0, inputPacket.getLength());
-            System.out.println("Đã tải file " + fileName + " về");
+            System.out.println("Da nhan file " + " tu server");
         } catch (IOException e) {
             e.printStackTrace();
             System.err.println("Lỗi server: " + e.getMessage());
